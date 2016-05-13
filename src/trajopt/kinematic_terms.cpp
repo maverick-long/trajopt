@@ -68,6 +68,16 @@ VectorXd CartPoseErrCalculator::operator()(const VectorXd& dof_vals) const {
   return err;  
 }
 
+VectorXd TwolinksCartPoseErrCalculator::operator()(const VectorXd& dof_vals) const {
+  manip_->SetDOFValues(toDblVec(dof_vals));
+  OR::Transform link1_transform = link1_->GetTransform();
+  OR::Transform link2_transform = link2_->GetTransform();
+
+  OR::Transform pose_err = link1_transform.inverse()*(link2_transform*transform_);
+  VectorXd err = concat(rotVec(pose_err.rot), toVector3d(pose_err.trans));
+  return err;
+}
+
 VectorXd CartDDPoseErrCalculator::operator()(const VectorXd& dof_vals) const {
   int n_dof = manip_->GetDOF();
   manip_->SetDOFValues(toDblVec(dof_vals.topRows(n_dof)));

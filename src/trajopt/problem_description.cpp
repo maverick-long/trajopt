@@ -58,6 +58,7 @@ void RegisterMakers() {
   TermInfo::RegisterMaker("cart_vel", &CartVelCntInfo::create);
   TermInfo::RegisterMaker("joint_vel_limits", &JointVelConstraintInfo::create);
   TermInfo::RegisterMaker("differential_pose", &CartDDCntInfo::create);
+  TermInfo::RegisterMaker("lock_twolinks", &TwolinksPoseCostInfo::create);
 
   gRegisteredMakers = true;
 }
@@ -345,8 +346,6 @@ void SetupPlotting(TrajOptProb& prob, Optimizer& opt) {
   opt.addCallback(boost::bind(&TrajPlotter::OptimizerCallback, *plotter, _1, _2));
 }
 
-
-
 void PoseCostInfo::fromJson(const Value& v) {
   FAIL_IF_FALSE(v.isMember("params"));
   const Value& params = v["params"];  
@@ -381,6 +380,41 @@ void PoseCostInfo::hatch(TrajOptProb& prob) {
   prob.GetPlotter()->Add(PlotterPtr(new CartPoseErrorPlotter(f, prob.GetVarRow(timestep))));
   prob.GetPlotter()->AddLink(link);
 
+}
+
+void TwolinksPoseCostInfo::fromJson(const Value& v) {
+  FAIL_IF_FALSE(v.isMember("params"));
+  const Value& params = v["params"];  
+  childFromJson(params, timestep, "timestep", gPCI->basic_info.n_steps-1);
+  childFromJson(params, xyz,"xyz");
+  childFromJson(params, wxyz,"wxyz");
+  childFromJson(params, pos_coeffs,"pos_coeffs", (Vector3d)Vector3d::Ones());
+  childFromJson(params, rot_coeffs,"rot_coeffs", (Vector3d)Vector3d::Ones());
+
+  string linkstr;
+  childFromJson(params, linkstr, "link1");
+  link1 = GetLinkMaybeAttached(gPCI->rad->GetRobot(), linkstr);
+  if (!link1) {
+    PRINT_AND_THROW(boost::format("invalid link name: %s")%linkstr);
+  }
+  childFromJson(params, linkstr, "link2");
+  link2 = GetLinkMaybeAttached(gPCI->rad->GetRobot(), linkstr);
+  if (!link2) {
+    PRINT_AND_THROW(boost::format("invalid link name: %s")%linkstr);
+  }
+
+  const char* all_fields[] = {"timestep", "xyz", "wxyz", "pos_coeffs", "rot_coeffs", "link1", "link2"};
+  ensure_only_members(params, all_fields, sizeof(all_fields)/sizeof(char*));
+}
+
+void TwolinksPoseCostInfo::hatch(TrajOptProb& prob) {
+  VectorOfVectorPtr f(new TwolinksCartPoseErrCalculator(toRaveTransform(wxyz, xyz), prob.GetRAD(), link1, link2));
+  if(term_type == TT_COST){
+    prob.addCost(CostPtr(new CostFromErrFunc(f, prob.GetVarRow(timestep), concat(rot_coeffs, pos_coeffs), ABS, name)));
+  }
+  else if(term_type == TT_CNT) {
+    prob.addConstraint(ConstraintPtr(new ConstraintFromFunc(f, prob.GetVarRow(timestep), concat(rot_coeffs, pos_coeffs), EQ, name)));
+  }
 }
 
 void PositionConstraintInfo::fromJson(const Value& v){

@@ -7,7 +7,7 @@
     </Mass>
  
     <Geom type="box">
-      <Extents>.25 .15 .5</Extents>
+      <Extents>.15 .15 .15</Extents>
    	</Geom>
  </Body>
 </KinBody>

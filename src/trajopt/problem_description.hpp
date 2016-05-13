@@ -178,6 +178,18 @@ struct PoseCostInfo : public TermInfo, public MakesCost, public MakesConstraint 
   DEFINE_CREATE(PoseCostInfo);
 };
 
+struct TwolinksPoseCostInfo : public TermInfo, public MakesCost, public MakesConstraint {
+  int timestep;
+  Vector3d xyz;
+  Vector4d wxyz;
+  Vector3d pos_coeffs, rot_coeffs;
+  KinBody::LinkPtr link1;
+  KinBody::LinkPtr link2;
+  void fromJson(const Value& v);
+  void hatch(TrajOptProb& prob);
+  DEFINE_CREATE(TwolinksPoseCostInfo);
+};
+
 struct PositionConstraintInfo : public TermInfo, public MakesConstraint {
 	  int timestep;
 	  Vector3d plane1;
