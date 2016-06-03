@@ -1,10 +1,24 @@
-<Environment>
-  <KinBody name="table">
-    <Body type="static" name="table_link">
-      <Geom type="box">
-        <Translation> 1.1 0 .635 </Translation>
-        <extents> .85 .55 .01 </extents>
-      </Geom>
-    </Body>
-  </KinBody>
-</Environment>
+<KinBody name="table">
+	<Body type="static">
+		<Geom type="box">
+			<extents>0.35 0.65 0.01</extents>
+			<translation>0 0 0.7</translation>
+			<quat>1 0 0 0</quat>
+		</Geom>
+	</Body>
+	<Body type="static">
+		<Geom type="box">
+			<extents>0.05 0.05 0.35</extents>
+			<translation>0 0 0.35</translation>
+			<quat>1 0 0 0</quat>
+		</Geom>
+	</Body>
+	<Body type="static">
+		<Geom type="box">
+			<extents>0.2 0.25 0.015</extents>
+			<translation>0 0 0.015</translation>
+			<quat>1 0 0 0</quat>
+		</Geom>
+	</Body>
+</KinBody>
+

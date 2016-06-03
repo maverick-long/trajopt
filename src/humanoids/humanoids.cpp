@@ -272,7 +272,7 @@ MatrixX2d GetFeetPoly_Munip(const vector<KinBody::LinkPtr>& links) {
   OpenRAVE::Vector v1 = GetZMPVector(*links[0]);
   OpenRAVE::Vector v2 = GetZMPVector(*links[1]);
   OpenRAVE::Vector vcenter;
-  vcenter.x = (v1.x + v2.x)/2+0.035;
+  vcenter.x = (v1.x + v2.x)/2+0.045;
   vcenter.y = (v1.y + v2.y)/2;
   vcenter.z = 0;
   MatrixX2d allpoly = local_zmp_poly.rowwise() + Vector2d(vcenter.x, vcenter.y).transpose();
