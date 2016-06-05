@@ -1,4 +1,4 @@
-#ifndef KINEMATICS_TERMS_HPP
+  #ifndef KINEMATICS_TERMS_HPP
 #define KINEMATICS_TERMS_HPP
 
 #pragma once
@@ -49,6 +49,30 @@ struct CartPoseErrorPlotter : public Plotter {
   VarVector m_vars;
   CartPoseErrorPlotter(boost::shared_ptr<void> calc, const VarVector& vars) : m_calc(calc), m_vars(vars) {}
   void Plot(const DblVec& x, OR::EnvironmentBase& env, std::vector<OR::GraphHandlePtr>& handles);
+};
+
+struct  PushSupportPolygonErrCalculator: public VectorOfVector
+{
+  ConfigurationPtr manip_;
+  OR::KinBody::LinkPtr link_;
+  Vector3d offset_;
+  PushSupportPolygonErrCalculator(ConfigurationPtr manip, OR::KinBody::LinkPtr link,  Eigen::Vector3d offset) :
+    manip_(manip),
+    link_(link),
+    offset_(offset){}
+  VectorXd operator()(const VectorXd& dof_vals) const;
+};
+
+struct PushSupportPolygonOneFootErrCalculator : public VectorOfVector 
+{
+  ConfigurationPtr manip_;
+  OR::KinBody::LinkPtr link_;
+  OR::Transform fixed_foot_transform_;
+  PushSupportPolygonOneFootErrCalculator(const OR::Transform& fixed_foot_transform, ConfigurationPtr manip, OR::KinBody::LinkPtr link) :
+  fixed_foot_transform_(fixed_foot_transform),
+  manip_(manip),
+  link_(link){}
+  VectorXd operator()(const VectorXd& dof_vals) const;
 };
 
 struct TwolinksCartPoseErrCalculator : public VectorOfVector

@@ -18,6 +18,18 @@ struct ZMPConstraint : public IneqConstraint, public Plotter {
 
 };
 
+struct ZMPOneFootConstraint : public IneqConstraint, public Plotter
+{
+  RobotAndDOFPtr m_rad;
+  VarVector m_vars;
+  MatrixX2d m_ab;
+  VectorXd m_c;
+  vector<KinBody::LinkPtr> planted_links_;
+  ZMPOneFootConstraint(RobotAndDOFPtr rad, vector<KinBody::LinkPtr> planted_links, const VarVector& vars);
+  DblVec value(const DblVec&);
+  ConvexConstraintsPtr convex(const DblVec&, Model* model);
+  void Plot(const DblVec& x, OR::EnvironmentBase& env, std::vector<OR::GraphHandlePtr>& handles);
+};
 
 struct StaticTorqueCost : public CostFromErrFunc {
   RobotAndDOFPtr m_rad;

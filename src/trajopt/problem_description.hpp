@@ -178,6 +178,27 @@ struct PoseCostInfo : public TermInfo, public MakesCost, public MakesConstraint 
   DEFINE_CREATE(PoseCostInfo);
 };
 
+struct PushSupportPolygonInfo : public TermInfo, public MakesCost, public MakesConstraint {
+  int timestep;
+  Vector3d pos_coeffs;
+  KinBody::LinkPtr link;
+  Vector3d offset;
+  void fromJson(const Value& v);
+  void hatch(TrajOptProb& prob);
+  DEFINE_CREATE(PushSupportPolygonInfo);
+};
+
+struct PushSupportPolygonOneFootInfo : public TermInfo, public MakesCost, public MakesConstraint {
+  int timestep;
+  Vector3d pos_coeffs;
+  KinBody::LinkPtr link;
+  Vector3d xyz;
+  Vector4d wxyz;
+  void fromJson(const Value& v);
+  void hatch(TrajOptProb& prob);
+  DEFINE_CREATE(PushSupportPolygonOneFootInfo);
+};
+
 struct TwolinksPoseCostInfo : public TermInfo, public MakesCost, public MakesConstraint {
   int timestep;
   Vector3d xyz;

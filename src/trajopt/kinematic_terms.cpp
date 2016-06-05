@@ -11,6 +11,7 @@
 #include <boost/format.hpp>
 #include <Eigen/Geometry>
 #include <iostream>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace sco;
@@ -66,6 +67,69 @@ VectorXd CartPoseErrCalculator::operator()(const VectorXd& dof_vals) const {
   OR::Transform pose_err = pose_inv_ * newpose;
   VectorXd err = concat(rotVec(pose_err.rot), toVector3d(pose_err.trans));
   return err;  
+}
+
+VectorXd PushSupportPolygonErrCalculator::operator()(const VectorXd& dof_vals) const {
+  manip_->SetDOFValues(toDblVec(dof_vals));
+
+  // calculate center of mass
+  float totalmass = 0;
+  OR::Vector moment(0,0,0);
+  RobotAndDOFPtr m_rad = boost::dynamic_pointer_cast<RobotAndDOF>(manip_);
+  BOOST_FOREACH(const KinBody::LinkPtr& link, m_rad->GetRobot()->GetLinks()) {
+    if (!link->GetGeometries().empty()) {
+      moment += link->GetGlobalCOM() * link->GetMass();
+      totalmass += link->GetMass();
+    }
+  }
+  moment /= totalmass;
+
+  OR::Transform link_transform = link_->GetTransform();
+  link_transform.trans = link_transform*OR::Vector(offset_[0],offset_[1],offset_[2],0);
+
+  Vector3d xyz;
+  xyz(0) = moment.x;
+  xyz(1) = moment.y;
+  xyz(2) = 0;
+
+  link_transform.trans.x -= moment.x;
+  link_transform.trans.y -= moment.y;
+
+  VectorXd err = concat(Vector3d(0,0,0), toVector3d(link_transform.trans));
+  return err;
+}
+
+VectorXd PushSupportPolygonOneFootErrCalculator::operator()(const VectorXd& dof_vals) const {
+  manip_->SetDOFValues(toDblVec(dof_vals));
+
+  // calculate center of mass
+  float totalmass = 0;
+  OR::Vector moment(0,0,0);
+  RobotAndDOFPtr m_rad = boost::dynamic_pointer_cast<RobotAndDOF>(manip_);
+  BOOST_FOREACH(const KinBody::LinkPtr& link, m_rad->GetRobot()->GetLinks()) {
+    if (!link->GetGeometries().empty()) {
+      moment += link->GetGlobalCOM() * link->GetMass();
+      totalmass += link->GetMass();
+    }
+  }
+  moment /= totalmass;
+
+  Vector3d xyz;
+  xyz(0) = moment.x;
+  xyz(1) = moment.y;
+  xyz(2) = 0;
+
+  OR::Transform link_transform = link_->GetTransform();
+  link_transform.trans = link_transform*OR::Vector(0.045,0,0);
+  OR::Transform transform = link_transform.inverse()*fixed_foot_transform_;
+  std::cout<< transform.trans.x<<","<<transform.trans.y<<","<<transform.trans.z<<std::endl;
+
+  link_transform.trans = link_transform*OR::Vector(transform.trans.x/2.0,transform.trans.y/2.0,0);
+  link_transform.trans.x -= moment.x;
+  link_transform.trans.y -= moment.y;
+
+  VectorXd err = concat(Vector3d(0,0,0), toVector3d(link_transform.trans));
+  return err;
 }
 
 VectorXd TwolinksCartPoseErrCalculator::operator()(const VectorXd& dof_vals) const {

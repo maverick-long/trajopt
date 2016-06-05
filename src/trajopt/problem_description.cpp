@@ -59,6 +59,8 @@ void RegisterMakers() {
   TermInfo::RegisterMaker("joint_vel_limits", &JointVelConstraintInfo::create);
   TermInfo::RegisterMaker("differential_pose", &CartDDCntInfo::create);
   TermInfo::RegisterMaker("lock_twolinks", &TwolinksPoseCostInfo::create);
+  TermInfo::RegisterMaker("push_supportpolygon", &PushSupportPolygonInfo::create);
+  TermInfo::RegisterMaker("PushSupportPolygonOneFoot", &PushSupportPolygonOneFootInfo::create);
 
   gRegisteredMakers = true;
 }
@@ -380,6 +382,65 @@ void PoseCostInfo::hatch(TrajOptProb& prob) {
   prob.GetPlotter()->Add(PlotterPtr(new CartPoseErrorPlotter(f, prob.GetVarRow(timestep))));
   prob.GetPlotter()->AddLink(link);
 
+}
+
+void PushSupportPolygonInfo::fromJson(const Value& v) {
+  FAIL_IF_FALSE(v.isMember("params"));
+  const Value& params = v["params"];
+  childFromJson(params, timestep, "timestep");
+  childFromJson(params, pos_coeffs, "pos_coeffs");
+  childFromJson(params, offset,"offset",(Vector3d)Vector3d::Zero());
+
+  string linkstr;
+  childFromJson(params, linkstr, "link");
+  link = GetLinkMaybeAttached(gPCI->rad->GetRobot(), linkstr);
+  if (!link) {
+    PRINT_AND_THROW(boost::format("invalid link name: %s")%linkstr);
+  }
+
+  const char* all_fields[] = {"timestep","pos_coeffs","link","offset"};
+  ensure_only_members(params, all_fields, sizeof(all_fields)/sizeof(char*));
+}
+
+void PushSupportPolygonInfo::hatch(TrajOptProb& prob) {
+  Vector3d rot_coeffs(0,0,0);
+  VectorOfVectorPtr f(new PushSupportPolygonErrCalculator(prob.GetRAD(), link, offset));
+  if (term_type == TT_COST) {
+    prob.addCost(CostPtr(new CostFromErrFunc(f, prob.GetVarRow(timestep), concat(rot_coeffs, pos_coeffs), ABS, name)));
+  }
+  else if (term_type == TT_CNT) {
+    prob.addConstraint(ConstraintPtr(new ConstraintFromFunc(f, prob.GetVarRow(timestep), concat(rot_coeffs, pos_coeffs), EQ, name)));
+  }
+}
+
+void PushSupportPolygonOneFootInfo::fromJson(const Value& v) {
+  FAIL_IF_FALSE(v.isMember("params"));
+  const Value& params = v["params"];
+  childFromJson(params, xyz, "xyz");
+  childFromJson(params, wxyz, "wxyz");
+  childFromJson(params, timestep, "timestep");
+  childFromJson(params, pos_coeffs,"pos_coeffs");
+
+  string linkstr;
+  childFromJson(params, linkstr, "link");
+  link = GetLinkMaybeAttached(gPCI->rad->GetRobot(), linkstr);
+  if (!link) {
+    PRINT_AND_THROW(boost::format("invalid link name: %s")%linkstr);
+  }
+
+  const char* all_fields[] = {"timestep","xyz","wxyz","pos_coeffs","link"};
+  ensure_only_members(params, all_fields, sizeof(all_fields)/sizeof(char*));
+}
+
+void PushSupportPolygonOneFootInfo::hatch(TrajOptProb& prob) {
+  Vector3d rot_coeffs(0,0,0);
+  VectorOfVectorPtr f(new PushSupportPolygonOneFootErrCalculator(toRaveTransform(wxyz, xyz), prob.GetRAD(), link));
+  if (term_type == TT_COST) {
+    prob.addCost(CostPtr(new CostFromErrFunc(f, prob.GetVarRow(timestep), concat(rot_coeffs, pos_coeffs), ABS, name)));
+  }
+  else if (term_type == TT_CNT) {
+    prob.addConstraint(ConstraintPtr(new ConstraintFromFunc(f, prob.GetVarRow(timestep), concat(rot_coeffs, pos_coeffs), EQ, name)));
+  }
 }
 
 void TwolinksPoseCostInfo::fromJson(const Value& v) {
