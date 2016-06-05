@@ -122,7 +122,6 @@ VectorXd PushSupportPolygonOneFootErrCalculator::operator()(const VectorXd& dof_
   OR::Transform link_transform = link_->GetTransform();
   link_transform.trans = link_transform*OR::Vector(0.045,0,0);
   OR::Transform transform = link_transform.inverse()*fixed_foot_transform_;
-  std::cout<< transform.trans.x<<","<<transform.trans.y<<","<<transform.trans.z<<std::endl;
 
   link_transform.trans = link_transform*OR::Vector(transform.trans.x/2.0,transform.trans.y/2.0,0);
   link_transform.trans.x -= moment.x;
