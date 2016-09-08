@@ -6,6 +6,7 @@ from openravepy import *
 # import array
 import time
 from numpy import *
+from numpy.linalg import inv
 
 def draw_ax(T, size, env, handles):
     p0 = T[:3,3]
@@ -18,7 +19,7 @@ def draw_ax(T, size, env, handles):
 env = Environment() # create openrave environment
 env.SetViewer('qtcoin') # attach viewer (optional)
 # viewer = trajoptpy.GetViewer(env)
-env.Load('../val_motionplanning/valkyrie_description/valkyrie_simplified.dae') # load a simple scene
+env.Load('../val_motionplanning/valkyrie_description/valkyrie_C.dae') # load a simple scene
 # env.Load('../data/door.xml') # load a simple scene
 robot = env.GetRobots()[0] # get the first robot
 kinbody = env.GetBodies()
@@ -40,12 +41,19 @@ activejoint = [robot.GetJoint("leftHipYaw").GetDOFIndex(),robot.GetJoint("leftHi
                robot.GetJoint("rightWristRoll").GetDOFIndex(),robot.GetJoint("rightWristPitch").GetDOFIndex()]
 
 robot.SetActiveDOFs(activejoint)
-robot.SetActiveDOFValues([  0, 0, -0.62, 1.34, -0.72, 0,
-                            0, 0, -0.62, 1.34, -0.72, 0,
-                            0, 0, 0,
-                            -0.2,-1.2, 0.70, -1.5, 1.3, 0.024, 0.0454, 
-                            0, 0, 0, 
-                            -0.2, 1.2, 0.70, 1.5, 1.3, -0.024, -0.0454])
+# robot.SetActiveDOFValues([0, 0, -0.62, 1.34, -0.72, 0,
+#                                   0, 0, -0.62, 1.34, -0.72, 0,
+#                                   0, 0, 0,
+#                                   -0.2,-1.2, 0.70, -1.5, 1.3, 0.024, 0.0454, 
+#                                   0, 0, 0, 
+#                                   -0.2, 1.2, 0.70, 1.5, 1.3, -0.024, -0.0454])
+
+robot.SetActiveDOFValues([-0.040029726922512054, -0.03369460999965668, -0.44156399369239807, 1.0303349494934082, -0.67119961977005, 0.05691482871770859, 
+                          -0.01733711175620556, 0.07575292885303497, -0.4435535967350006, 1.0348072052001953, -0.6449311375617981, -0.07128202170133591, 
+                          -0.030195342376828194, -0.03811405599117279, 0.008478663861751556, 
+                          -0.16961249709129333, -1.1993234157562256, 0.6941242814064026, -1.5178706645965576, 0.0, 0.0, 0.0, 
+                          0.014572739601135254, -0.0004940032958984375, 0.0, 
+                          -0.19163087010383606, 1.2046902179718018, 0.6956586837768555, 1.506352424621582, 0.0, 0.0, 0.0])
 
 # Set transparency of the robot
 for link in robot.GetLinks():
@@ -53,12 +61,14 @@ for link in robot.GetLinks():
                 geom.SetTransparency(0.8)
 
 # Set up robot in initial transform
-init_transform = numpy.eye(4)
-init_transform[:3,3] = [-0.4, -0.2, .08]
-robot.SetTransform(init_transform)
+# init_transform = numpy.eye(4)
+# init_transform[:3,3] = [-0.4, -0.2, .08]
+# robot.SetTransform(init_transform)
 
-Tz = matrixFromAxisAngle([0,0,numpy.pi/3])
-robot.SetTransform(numpy.dot(Tz,robot.GetTransform()))
+# Tz = matrixFromAxisAngle([0,0,numpy.pi/3])
+# robot.SetTransform(numpy.dot(Tz,robot.GetTransform()))
+
+robot.SetTransform(inv(robot.GetLink("leftFoot").GetTransform()))
 
 handles = []
 # T = robot.GetLink("l_hand").GetTransform()
@@ -86,6 +96,20 @@ for link in robot.GetLinks():
                                            colors=array(((0,0,1))),
                                            drawstyle=1))
 
+# handles.append(env.plot3(points=[0,0, 0],
+#                           pointsize=0.02,
+#                           colors=array(((0,1,0))),
+#                           drawstyle=1))
+
+compoint = robot.GetCenterOfMass()
+handles.append(env.plot3(points=[compoint[0],compoint[1],0],
+                          pointsize=0.02,
+                          colors=array(((1,0,0))),
+                          drawstyle=1))
+
+print "com: %f, %f, %f" % (compoint[0],compoint[1],compoint[2])
+compoint = robot.GetLink("rightFoot").GetGlobalCOM()
+print "com: %f, %f, %f" % (compoint[0],compoint[1],compoint[2])
 newrobots = []
 newrobot = RaveCreateRobot(env,robot.GetXMLId())
 newrobot.Clone(robot,0)
