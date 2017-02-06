@@ -37,4 +37,5 @@ Here, I list the installation steps which I followed.
     `export OPENRAVE_DATA='${OPENRAVE_DATA}':~/valkyrie_workspace/src/trajopt `<br>
     `export PYTHONPATH=$PYTHONPATH:$(openrave-config --python-dir):~/valkyrie_workspace/devel/lib:~/valkyrie_workspace/build/trajopt:~/valkyrie_workspace/src/trajopt`<br>
     `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(openrave-config --python-dir)/openravepy/_openravepy_:/usr/lib:/usr/local/lib:~/valkyrie_workspace/devel/lib`<br>
+    you may want to change, for example, 'valkyrie_workspace', to your workspace name.
   * catkin_make
