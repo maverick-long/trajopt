@@ -1,0 +1,13 @@
+<KinBody name="book">
+  <Body name="book" type="dynamic">
+    <Translation>0 0 0</Translation>
+    <!--rotation of the body specified as a rotation axis. First three numbers are the axis.-->
+    <Mass type="mimicgeom">
+      <density>1</density>
+    </Mass>
+ 
+    <Geom type="box">
+      <Extents>0.088961 0.023683 0.129124</Extents>
+   	</Geom>
+ </Body>
+</KinBody>

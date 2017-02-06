@@ -26,11 +26,12 @@ xyz_target = [6.51073449e-01,  -1.87673551e-01, 4.91061915e-01]
 hmat_target = openravepy.matrixFromPose( np.r_[quat_target, xyz_target] )
 
 # BEGIN ik
-manip = robot.GetManipulator("rightarm")
-init_joint_target = ku.ik_for_link(hmat_target, manip, "r_gripper_tool_frame",
-    filter_options = openravepy.IkFilterOptions.CheckEnvCollisions)
+# manip = robot.SetActiveManipulator('rightarm_torso')
+# init_joint_target = ku.ik_for_link(hmat_target, manip, "r_gripper_tool_frame",
+#     filter_options = openravepy.IkFilterOptions.CheckEnvCollisions)
 # END ik
 
+init_joint_target = np.asarray(joint_start)
 
 request = {
   "basic_info" : {
@@ -79,7 +80,7 @@ if args.position_only: request["constraints"][0]["params"]["rot_coeffs"] = [0,0,
 s = json.dumps(request) # convert dictionary into json-formatted string
 prob = trajoptpy.ConstructProblem(s, env) # create object that stores optimization problem
 result = trajoptpy.OptimizeProblem(prob) # do optimization
-print result
+print result.GetTraj()
 
 from trajoptpy.check_traj import traj_is_safe
 prob.SetRobotActiveDOFs() # set robot DOFs to DOFs in optimization problem

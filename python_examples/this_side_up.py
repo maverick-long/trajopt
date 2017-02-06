@@ -26,9 +26,9 @@ xyz_target = [.6,-.6,1]
 n_steps = 15
 hmat_target = openravepy.matrixFromPose( np.r_[(0,1,0,0), xyz_target] )
 
-init_joint_target = ku.ik_for_link(hmat_target, manip, "r_gripper_tool_frame",
-    filter_options = openravepy.IkFilterOptions.CheckEnvCollisions)
-
+# init_joint_target = ku.ik_for_link(hmat_target, manip, "r_gripper_tool_frame",
+#     filter_options = openravepy.IkFilterOptions.CheckEnvCollisions)
+init_joint_target = np.asarray([0,0,0,0,0,0,0])
 
 request = {
   "basic_info" : {
@@ -117,4 +117,5 @@ else: #use constraint
 # END add_constraints
 
 result = trajoptpy.OptimizeProblem(prob) # do optimization
+print result.GetTraj()
 assert [viol <= 1e-4 for (_name,viol) in result.GetConstraints()]

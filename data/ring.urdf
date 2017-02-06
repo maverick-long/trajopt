@@ -1,0 +1,21 @@
+<robot name="ring" xmlns:xacro="http://ros.org/wiki/xacro">
+<link name="ring">
+    <inertial>
+      <mass value="8.22"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.11866378" ixy="-0.000143482" ixz="0.003271293" iyy="0.097963425" iyz="0.002159545" izz="0.083854638"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://trajopt/data/ring.stl"/>
+      </geometry>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://trajopt/data/ring.stl"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+</link>
+</robot>
