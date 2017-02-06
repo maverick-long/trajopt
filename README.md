@@ -1,5 +1,6 @@
-trajopt is an optimization-based motion planning library written by John Schulman. The original document can be found in here:
+trajopt is an optimization-based motion planning library written by John Schulman. The original document on installing trajopt can be found in here:
 http://rll.berkeley.edu/trajopt/doc/sphinx_build/html/#
+
 ### Changes we made in this repo
 * it can be compiled as a catkin package through catkin_make
 * add more cost and constraint functions
@@ -31,7 +32,9 @@ Here, I list the installation steps which I followed.
     `echo export GUROBI_HOME="/opt/gurobi605/linux64" >> ~/.bashrc`<br>
 * install trajopt
   * clone this repo to your catkin workspace
-  * add openrave model folders into environment variable OPENRAVE_DATA.<br>
-    for example, in my computer, `echo export OPENRAVE_DATA='${OPENRAVE_DATA}':~/traj_ws/src/trajopt/ >> ~/.bashrc`<br>
+  * modify environment variable.<br>
+    for example, in my computer, I have the following configurations:
+    `export OPENRAVE_DATA='${OPENRAVE_DATA}':~/valkyrie_workspace/src/trajopt `<br>
+    `export PYTHONPATH=$PYTHONPATH:$(openrave-config --python-dir):~/valkyrie_workspace/devel/lib:~/valkyrie_workspace/build/trajopt:~/valkyrie_workspace/src/trajopt`<br>
+    `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(openrave-config --python-dir)/openravepy/_openravepy_:/usr/lib:/usr/local/lib:~/valkyrie_workspace/devel/lib`<br>
   * catkin_make
-
