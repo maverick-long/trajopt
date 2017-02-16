@@ -1,0 +1,9 @@
+<KinBody name="glovebox">
+	<translation>0 0 0</translation>
+	<Body type="static">
+		<Geom type="trimesh">
+			<Render>glovebox.dae 0.028</Render>
+			<!-- <diffuseColor>0 .2 .4</diffuseColor> -->
+		</Geom>
+	</Body>
+</KinBody>
