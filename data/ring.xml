@@ -1,0 +1,10 @@
+<KinBody name="ring">
+  <Body name="ring" type="dynamic">
+  	<Translation>0.5 -0.15 0.95</Translation>
+    <Geom type="trimesh">
+      <Collision>ring.stl 2</Collision>
+      <Render>ring.stl 2</Render>
+      <diffusecolor>1 0 0</diffusecolor>
+    </Geom> 
+ </Body>
+</KinBody>

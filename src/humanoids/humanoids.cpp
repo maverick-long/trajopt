@@ -31,11 +31,18 @@ const double footpolydata[8] = {
 MatrixX2d local_aabb_poly = Map<const MatrixX2d>(footpolydata,4,2);
 
 const double zmppolydata[8] = {
-    0.025, 0.025,
-    0.025, -0.025,
-    -0.025, -0.025,
-    -0.025, 0.025};
+    0.1, 0.16,
+    0.1, -0.16,
+    -0.1, -0.16,
+    -0.1, 0.16};
 MatrixX2d local_zmp_poly = Map<const MatrixX2d>(zmppolydata,4,2);
+
+// const double zmppolydata[8] = {
+//     0.025, 0.025,
+//     0.025, -0.025,
+//     -0.025, -0.025,
+//     -0.025, 0.025};
+// MatrixX2d local_zmp_poly = Map<const MatrixX2d>(zmppolydata,4,2);
 
 /**
 px,py,pz=aabb.pos()

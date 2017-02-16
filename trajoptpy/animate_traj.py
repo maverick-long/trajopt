@@ -1,4 +1,5 @@
 import openravepy
+import trajoptpy
 
 def animate_traj(traj, robot, pause=True, restore=True):
     """make sure to set active DOFs beforehand"""

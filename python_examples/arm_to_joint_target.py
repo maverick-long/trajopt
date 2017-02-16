@@ -45,7 +45,8 @@ request = {
   "constraints" : [
   {
     "type" : "joint", # joint-space target
-    "params" : {"vals" : joint_target } # length of vals = # dofs of manip
+    "params" : {"vals" : joint_target,
+                "coeffs" : [1] } # length of vals = # dofs of manip
   }
   ],
   "init_info" : {
@@ -58,7 +59,7 @@ prob = trajoptpy.ConstructProblem(s, env) # create object that stores optimizati
 t_start = time.time()
 result = trajoptpy.OptimizeProblem(prob) # do optimization
 t_elapsed = time.time() - t_start
-print result
+print result.GetTraj()
 print "optimization took %.3f seconds"%t_elapsed
 
 from trajoptpy.check_traj import traj_is_safe
